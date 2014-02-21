@@ -9,10 +9,9 @@
 
 
 
-#define LOCAL_SERVER_PORT 10000
 #define MAX_MSG 100 
 
-int main(){
+int main(int argc, char **argv){
 
   int   sd;
   struct sockaddr_in server;
@@ -31,22 +30,30 @@ int main(){
   puts("try binding local server port");
   server.sin_family = AF_INET;  
   server.sin_addr.s_addr = htonl(INADDR_ANY);
-  server.sin_port = htons(10000);
 
-  
+  if( argc!=2 ){
+    puts("please prive port number to run [ ./server 9090]");
+    return 1;
+  }
+  server.sin_port = htons( atoi(argv[1]) );
+
+  puts("creating a socket to which i will listen, receive and send");
   int rc;
   rc = bind( sd,  (struct sockaddr *) &server, sizeof(server));
+
   if(rc<0){
     puts("cann't bind port number ");
     return 1;
   }
 
-  printf("waiting for connection %u\n",LOCAL_SERVER_PORT);
-
+  printf("waiting for connection at port %d\n", atoi(argv[1]));
+  memset(buf,0,sizeof buf);
   for(;;){
     rc=recv (sd, buf, sizeof(buf), 0);
-    buf[rc]= (char) NULL;
-    printf("Received: %s\n", buf);
+    if(rc>0){
+        printf("Received: %s\n", buf);
+        buf[0]=0;
+    }
   }
 
    return 0;

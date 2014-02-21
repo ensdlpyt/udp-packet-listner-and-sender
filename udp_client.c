@@ -11,14 +11,18 @@
 #define PORT_NUMBER 10000
 #define MAX_MSG 100
 
-int main(){
+int main(int argc, char **argv){
 	int	sd;
 	struct	sockaddr_in server;
 									//IPPROTO_UDP
 	sd = socket (AF_INET,SOCK_DGRAM,0); 
 	server.sin_family = AF_INET;
-	server.sin_addr.s_addr = inet_addr("127.0.0.1");
-	server.sin_port = htons(PORT_NUMBER);
+	if( argc!=3 ){
+		puts("try ./client 127.0.0.1 9090");
+		return 1;
+	}
+	server.sin_addr.s_addr = inet_addr(argv[1]);
+	server.sin_port = htons(atoi(argv[2]));
 
 
 	char buf[MAX_MSG];
