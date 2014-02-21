@@ -9,12 +9,12 @@
 
 
 
-#define MAX_MSG 100 
+#define MAX_MSG 1024
 
 int main(int argc, char **argv){
 
   int   sd;
-  struct sockaddr_in server;
+  struct sockaddr_in server, client;
   char buf[MAX_MSG];
 
 
@@ -37,6 +37,8 @@ int main(int argc, char **argv){
   }
   server.sin_port = htons( atoi(argv[1]) );
 
+
+
   puts("creating a socket to which i will listen, receive and send");
   int rc;
   rc = bind( sd,  (struct sockaddr *) &server, sizeof(server));
@@ -47,12 +49,18 @@ int main(int argc, char **argv){
   }
 
   printf("waiting for connection at port %d\n", atoi(argv[1]));
-  memset(buf,0,sizeof buf);
+  int ln,clen;
+
   for(;;){
-    rc=recv (sd, buf, sizeof(buf), 0);
-    if(rc>0){
-        printf("Received: %s\n", buf);
-        buf[0]=0;
+    /* init buffer */
+    memset(buf,0x0,MAX_MSG);
+
+    clen = sizeof(client);
+    ln=recvfrom (sd, buf, MAX_MSG, 0, (struct sockaddr *) &client, &clen );
+    if(ln>0){
+        printf("From %s:UDP %u : %s \n",inet_ntoa(client.sin_addr),ntohs(client.sin_port),buf);
+    }else{
+        puts("could not receive data");
     }
   }
 
