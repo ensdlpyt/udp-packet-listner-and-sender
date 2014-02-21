@@ -49,11 +49,14 @@ int main(int argc, char **argv){
     //2: necessary module for encryption
     /* init vector */
     unsigned char iv_enc[AES_BLOCK_SIZE];
+    unsigned char iv_dec[AES_BLOCK_SIZE];
     RAND_bytes(iv_enc, AES_BLOCK_SIZE);
-    // so i can do with this aes-cbc-128 aes-cbc-192 aes-cbc-256
-    AES_KEY enc_key;
-    AES_set_encrypt_key(aes_key, keylength, &enc_key);
+    memcpy(iv_dec, iv_enc, AES_BLOCK_SIZE);
 
+    // so i can do with this aes-cbc-128 aes-cbc-192 aes-cbc-256
+    AES_KEY enc_key,dec_key;
+    AES_set_encrypt_key(aes_key, keylength, &enc_key);
+    AES_set_decrypt_key(aes_key, keylength, &dec_key);
 
 
 
@@ -70,23 +73,28 @@ int main(int argc, char **argv){
 
         const size_t encslength = ((inputslength + AES_BLOCK_SIZE) / AES_BLOCK_SIZE) * AES_BLOCK_SIZE;
         unsigned char enc_out[encslength];
+        unsigned char dec_out[encslength];
         memset(enc_out, 0x0, sizeof(enc_out));
+        memset(dec_out, 0x0, sizeof(enc_out));
 
 
 
 
 
         AES_cbc_encrypt(input_string, enc_out, inputslength, &enc_key, iv_enc, AES_ENCRYPT);
-
+        AES_cbc_encrypt(enc_out, dec_out, encslength, &dec_key, iv_dec, AES_DECRYPT);
 
         printf("original:\t");
         hex_print(input_string, inputslength );
         printf("encrypt:\t");
         hex_print(enc_out, sizeof(enc_out));
+
+        printf("decrypt:\t");
+        hex_print(dec_out, inputslength);
     }
 
 /*
-    AES_set_decrypt_key(aes_key, keylength, &dec_key);
+    
     AES_cbc_encrypt(enc_out, dec_out, encslength, &dec_key, iv_dec, AES_DECRYPT);
 
     printf("original:\t");
