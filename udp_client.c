@@ -8,12 +8,11 @@
 #include <string.h> /* memset() */
 
 
-#define PORT_NUMBER 10000
-#define MAX_MSG 100
+#define MAX_MSG 1024
 
 int main(int argc, char **argv){
 	int	sd;
-	struct	sockaddr_in server;
+	struct	sockaddr_in server, client;
 									//IPPROTO_UDP
 	sd = socket (AF_INET,SOCK_DGRAM,0); 
 	server.sin_family = AF_INET;
@@ -26,7 +25,8 @@ int main(int argc, char **argv){
 
 
 	char buf[MAX_MSG];
-	int i,j,sendSize;
+	char recvbuf[MAX_MSG];
+	int i,j,sendSize,clen;
 	for (i=1;i<=5;++i) {
 		for(j=0;j<i;++j){
 			buf[j]='P';
@@ -34,6 +34,12 @@ int main(int argc, char **argv){
 		buf[j]=0;
 		sendSize = sendto(sd, buf, strlen(buf) , 0, (struct sockaddr*) &server, sizeof(server));
 		printf("Sending %d\n",sendSize);
+
+
+		/* init buffer */
+    	memset(recvbuf,0x0,MAX_MSG);
+		int rc = recvfrom(sd,recvbuf, MAX_MSG, 0, (struct sockaddr *) &client, &clen );
+		printf("receive data AS  %s\n",recvbuf);
 		sleep(2);
 	}
 

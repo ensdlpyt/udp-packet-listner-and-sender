@@ -16,7 +16,7 @@ int main(int argc, char **argv){
   int   sd;
   struct sockaddr_in server, client;
   char buf[MAX_MSG];
-
+  char sendBuf[MAX_MSG];
 
   puts("try creating socket");
 
@@ -49,7 +49,7 @@ int main(int argc, char **argv){
   }
 
   printf("waiting for connection at port %d\n", atoi(argv[1]));
-  int ln,clen;
+  int ln,clen,hp,sendSize;
 
   for(;;){
     /* init buffer */
@@ -59,6 +59,9 @@ int main(int argc, char **argv){
     ln=recvfrom (sd, buf, MAX_MSG, 0, (struct sockaddr *) &client, &clen );
     if(ln>0){
         printf("From %s:UDP %u : %s \n",inet_ntoa(client.sin_addr),ntohs(client.sin_port),buf);
+        printf("Sending data back to client => \n");
+        sprintf(sendBuf,"Server: %s",buf);
+        sendSize = sendto(sd, sendBuf, strlen(sendBuf) , 0, ( struct sockaddr *) &client, sizeof(client) );
     }else{
         puts("could not receive data");
     }
