@@ -50,35 +50,6 @@ inline int generate_key(int keylength=128){
 inline size_t calculate_enclen(size_t inputslength){
 	return ((inputslength + AES_BLOCK_SIZE) / AES_BLOCK_SIZE) * AES_BLOCK_SIZE;
 }
-inline unsigned char *get_encrypt_data(unsigned char *normal_data, size_t inputslength, unsigned int keylength=128){
-	AES_KEY enc_key;
-	size_t encslength = calculate_enclen(inputslength);
-
-
-	unsigned char *enc_out=(unsigned char*)malloc(sizeof(unsigned char) *encslength);
-	memset(enc_out, 0x0, sizeof(enc_out) );
-
-	AES_set_encrypt_key(aes_key, keylength, &enc_key);
-    AES_cbc_encrypt(normal_data, enc_out, inputslength, &enc_key, iv_enc, AES_ENCRYPT);
-	
-	//hex_print(enc_out, encslength);
-	return enc_out;
-}
-
-inline unsigned char *get_decrypt_data(unsigned char *encrypted_data, size_t inputslength, unsigned int keylength=128){
-	AES_KEY dec_key;
-	size_t encslength = calculate_enclen(inputslength);
-
-    unsigned char *dec_out = (unsigned char*)malloc(sizeof(unsigned char) *inputslength);
-    memset(dec_out, 0x0, sizeof(dec_out));
-
-	AES_set_decrypt_key(aes_key, keylength, &dec_key);
-    AES_cbc_encrypt(encrypted_data, dec_out, encslength, &dec_key, iv_dec, AES_DECRYPT);
-
-	//hex_print(dec_out, inputslength);
-	return dec_out;
-}
-
 inline void wait(double seconds) {
         double endtime = clock() + (seconds * CLOCKS_PER_SEC);
         while (clock() < endtime) {
